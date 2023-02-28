@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
@@ -11,9 +12,15 @@ export const watchPartyRouter = createTRPCRouter({
     });
   }),
   create: protectedProcedure
-    .input(z.object({}))
+    .input(createWatchPartySchema)
     .mutation(async ({ input, ctx }) => {
-      //   ctx.session.user.
-      //
+      const watchParty = await prisma.watchParty.create({
+        data: {
+          ...input,
+          hostId: ctx.session.user.id,
+        },
+      });
+
+      return watchParty;
     }),
 });

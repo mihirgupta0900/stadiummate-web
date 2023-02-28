@@ -68,11 +68,9 @@ model WatchParty {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     title     String
-    date      DateTime
-    time      String
+    time      DateTime @db.Timestamptz
     location  String
     host      User     @relation(fields: [hostId], references: [id], name: "host")
     hostId    String
-    hostImage String
     attendees User[]   @relation(name: "attendees")
 }
