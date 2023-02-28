@@ -21,38 +21,26 @@ export const engagementRouter = createTRPCRouter({
     const [qnAs, slides] = await Promise.all([
       prisma.qnA.findMany({
         where: {
-          AND: [
-            {
-              active: true,
-            },
-            {
-              QnAResponses: {
-                some: {
-                  userId: {
-                    not: ctx.session.user.id,
-                  },
-                },
+          active: true,
+          QnAResponses: {
+            some: {
+              userId: {
+                not: ctx.session.user.id,
               },
             },
-          ],
+          },
         },
       }),
       prisma.slide.findMany({
         where: {
-          AND: [
-            {
-              active: true,
-            },
-            {
-              SlideSeen: {
-                some: {
-                  userId: {
-                    not: ctx.session.user.id,
-                  },
-                },
+          active: true,
+          SlideSeen: {
+            some: {
+              userId: {
+                not: ctx.session.user.id,
               },
             },
-          ],
+          },
         },
       }),
     ]);
