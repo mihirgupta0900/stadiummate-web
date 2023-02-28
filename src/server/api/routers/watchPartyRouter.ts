@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
@@ -8,6 +7,11 @@ export const watchPartyRouter = createTRPCRouter({
     return prisma.watchParty.findMany({
       orderBy: {
         createdAt: "desc",
+      },
+      where: {
+        time: {
+          gt: new Date(),
+        },
       },
     });
   }),
