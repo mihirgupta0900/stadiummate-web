@@ -10,6 +10,7 @@ export const createWatchPartySchema = z.object({
   title: z.string(),
   location: z.string(),
   time: z.date(),
+  cost: z.number(),
 });
 
 const useZodForm = <TSchema extends z.ZodType>(
@@ -64,8 +65,17 @@ const WatchParty = () => {
         </div>
         <div className="">
           <label>
+            Cost <br />
+            <input
+              className="border border-black"
+              type="number"
+              {...register("cost", { valueAsNumber: true })}
+            />
+          </label>
+        </div>
+        <div className="">
+          <label>
             Date <br />
-            {/* <input className="border border-black" {...register("location")} /> */}
             <Controller
               control={control}
               name="time"

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "WatchParty" ADD COLUMN     "cost" INTEGER NOT NULL DEFAULT 10;

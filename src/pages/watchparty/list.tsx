@@ -45,6 +45,7 @@ const WatchPartyItem: FC<{
       <h2>Location: {party.location}</h2>
       <h3>Date and Time: {party.time.toLocaleString()}</h3>
       <div>Attendees: {party.attendees.length}</div>
+      <div>Cost: ${party.cost}</div>
       {isHost ? (
         <span>You are the host!</span>
       ) : isAttendee ? (
