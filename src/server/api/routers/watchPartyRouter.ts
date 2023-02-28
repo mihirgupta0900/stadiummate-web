@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
@@ -13,6 +14,9 @@ export const watchPartyRouter = createTRPCRouter({
           gt: new Date(),
         },
       },
+      include: {
+        attendees: true,
+      },
     });
   }),
   create: protectedProcedure
@@ -26,5 +30,32 @@ export const watchPartyRouter = createTRPCRouter({
       });
 
       return watchParty;
+    }),
+
+  join: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const watchParty = await prisma.watchParty.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!watchParty) {
+        throw new Error("Watch party not found");
+      }
+
+      await prisma.watchParty.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          attendees: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+        },
+      });
     }),
 });
