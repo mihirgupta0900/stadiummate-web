@@ -29,6 +29,8 @@ export const watchPartyRouter = createTRPCRouter({
         },
       });
 
+      // award token
+
       return watchParty;
     }),
 
@@ -57,5 +59,7 @@ export const watchPartyRouter = createTRPCRouter({
           },
         },
       });
+
+      // award token
     }),
 });
