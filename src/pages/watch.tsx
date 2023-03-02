@@ -1,3 +1,4 @@
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Button,
   Card,
@@ -14,25 +15,25 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Skeleton,
   Stack,
   Text,
   useDisclosure,
   type InputProps,
   type UseDisclosureReturn,
-  Spinner,
-  Skeleton,
 } from "@chakra-ui/react";
+
 import Image from "next/image";
 import { forwardRef, type FC } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
 import Layout from "~/components/Layout";
-import { api, RouterOutputs } from "~/utils/api";
+import { api, type RouterOutputs } from "~/utils/api";
 import { useZodForm } from "~/utils/form";
 
+import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { WatchParty } from "@prisma/client";
 
 const Watch = () => {
   const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
@@ -77,6 +78,12 @@ const Watch = () => {
 const Party: FC<{
   watchParty: RouterOutputs["watchParty"]["getAll"][number];
 }> = ({ watchParty: party }) => {
+  const { data: session } = useSession();
+  const isHost = party.hostId === session?.user?.id;
+  const isAttendee = party.attendees.some(
+    (attendee) => attendee.id === session?.user?.id
+  );
+
   return (
     <Card maxW="sm" bg="#F1F1F1" className="col-span-1 mx-auto">
       <ChakraImage
@@ -132,8 +139,13 @@ const Party: FC<{
             </div>
           </div>
         </Stack>
-        <Button mt="4" width={"full"}>
-          Join
+        <Button
+          mt="4"
+          width={"full"}
+          isDisabled={isHost || isAttendee}
+          {...(isAttendee && { rightIcon: <CheckIcon /> })}
+        >
+          {isHost ? "You are host" : isAttendee ? "Joined" : "Join"}
         </Button>
       </CardBody>
     </Card>
@@ -196,7 +208,6 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
               Host a watch party
             </Heading>
           </ModalHeader>
-          {/* <ModalCloseButton /> */}
           <ModalBody>
             <form
               className="mt-4"

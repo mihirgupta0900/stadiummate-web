@@ -30,9 +30,17 @@ const buttonTheme = defineStyleConfig({
       _hover: {
         bg: "#7267CB",
         color: "white",
+        _disabled: {
+          bg: "gray.800",
+          color: "white",
+        },
       },
       _active: {
         bg: "#7267CB",
+        color: "white",
+      },
+      _disabled: {
+        bg: "gray.800",
         color: "white",
       },
     },
