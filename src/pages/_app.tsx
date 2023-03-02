@@ -1,6 +1,4 @@
 import { type AppType } from "next/app";
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import {
   ChakraProvider,
   defineStyleConfig,
@@ -11,6 +9,7 @@ import { Montserrat } from "@next/font/google";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import { initFirebase } from "~/utils/firebase";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -57,18 +56,15 @@ const theme = extendTheme({
   },
 });
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}) => {
+initFirebase();
+
+const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <SessionProvider session={session}>
-      <main className={montserrat.className}>
-        <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
-        </ChakraProvider>
-      </main>
-    </SessionProvider>
+    <main className={montserrat.className}>
+      <ChakraProvider theme={theme}>
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </main>
   );
 };
 

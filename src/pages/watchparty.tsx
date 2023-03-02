@@ -31,11 +31,12 @@ import Layout from "~/components/Layout";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useZodForm } from "~/utils/form";
 
-import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDropzone } from "react-dropzone";
 import { env } from "~/env.mjs";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getAuth } from "firebase/auth";
 
 const Watch = () => {
   const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
@@ -78,10 +79,12 @@ const Watch = () => {
 const Party: FC<{
   watchParty: RouterOutputs["watchParty"]["getAll"][number];
 }> = ({ watchParty: party }) => {
-  const { data: session } = useSession();
-  const isHost = party.hostId === session?.user?.id;
+  const auth = getAuth();
+  const [user] = useAuthState(auth);
+  const isHost = party.hostId === user?.uid;
   const isAttendee = party.attendees.some(
-    (attendee) => attendee.id === session?.user?.id
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (attendee) => attendee.id === user?.uid
   );
   const isFull = party.attendees.length === party.capacity;
   const watchPartyUtils = api.useContext().watchParty;
