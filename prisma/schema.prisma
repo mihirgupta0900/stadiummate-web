@@ -66,16 +66,17 @@ model VerificationToken {
 }
 
 model WatchParty {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    title     String
-    time      DateTime @db.Timestamptz
-    location  String
-    cost      Int      @default(10)
-    host      User     @relation(fields: [hostId], references: [id], name: "host")
-    hostId    String
-    attendees User[]   @relation(name: "attendees")
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    title      String
+    time       DateTime @db.Timestamptz
+    location   String
+    cost       Int      @default(10)
+    host       User     @relation(fields: [hostId], references: [id], name: "host")
+    hostId     String
+    coverImage String   @default("https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80")
+    attendees  User[]   @relation(name: "attendees")
 }
 
 // -------------------------------------------------------------------------- */

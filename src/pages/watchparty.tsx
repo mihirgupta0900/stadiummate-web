@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 
 import Image from "next/image";
-import { forwardRef, type FC } from "react";
+import { forwardRef, useEffect, useState, type FC } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
 import Layout from "~/components/Layout";
@@ -34,9 +34,11 @@ import { useZodForm } from "~/utils/form";
 import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useDropzone } from "react-dropzone";
+import { env } from "~/env.mjs";
 
 const Watch = () => {
-  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
+  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: true });
   const { data: watchParties, isLoading } = api.watchParty.getAll.useQuery();
 
   return (
@@ -54,7 +56,6 @@ const Watch = () => {
         </p>
         <div className="mt-14">
           <h2 className="text-[32px] font-medium">Watch Parties Near You</h2>
-          {/* <div className="mt-10"> */}
           {isLoading || !watchParties ? (
             <Stack mt={4}>
               <Skeleton height="50px" />
@@ -68,7 +69,6 @@ const Watch = () => {
               ))}
             </div>
           )}
-          {/* </div> */}
         </div>
       </div>
     </Layout>
@@ -94,7 +94,7 @@ const Party: FC<{
   return (
     <Card maxW="sm" bg="#F1F1F1" className="col-span-1 mx-auto">
       <ChakraImage
-        src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+        src={party.coverImage}
         alt="Green double couch with wooden legs"
         borderTopRadius={"lg"}
       />
@@ -172,6 +172,9 @@ export const createWatchPartySchema = z.object({
     required_error: "Cost is required",
     invalid_type_error: "Cost must be a number",
   }),
+  coverImage: z.string().min(1, {
+    message: "Cover image is required",
+  }),
 });
 
 const CustomInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
@@ -188,6 +191,22 @@ const CustomInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
 ));
 CustomInput.displayName = "CustomInput";
 
+const handleUpload = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${env.NEXT_PUBLIC_CLOUDINARY_CLOUD_ID}/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  return response.json().then((data) => data.secure_url as string);
+};
+
 const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
   isOpen,
   onClose,
@@ -203,14 +222,22 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
     register,
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    reset,
+    formState: { errors, isValid, isSubmitting },
   } = useZodForm({
     schema: createWatchPartySchema,
   });
 
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={handleClose} size="xl">
         <ModalOverlay />
         <ModalContent bg="#1C202D" color="white">
           <ModalHeader mx={"auto"} mt={4}>
@@ -222,9 +249,12 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
             <form
               className="mt-4"
               onSubmit={(e) => {
-                handleSubmit((values) => {
-                  mutation.mutate(values);
-                  // console.log(values);
+                handleSubmit(async (values) => {
+                  if (!coverImage) return;
+
+                  const coverImageURL = await handleUpload(coverImage);
+                  values.coverImage = coverImageURL;
+                  await mutation.mutateAsync(values);
                 })(e).catch(() => {
                   console.log(e);
                 });
@@ -301,19 +331,35 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
                   </>
                 )}
               />
+              <Controller
+                control={control}
+                name="coverImage"
+                render={({ field }) => (
+                  <Dropzone
+                    onChange={field.onChange}
+                    previewURL={field.value}
+                    setFile={setCoverImage}
+                  />
+                )}
+              />
               <div className="my-6 flex justify-between">
                 <Button
                   colorScheme="blue"
                   width="full"
                   mr={2}
                   type="submit"
-                  isLoading={mutation.isLoading}
+                  isLoading={isSubmitting}
                   loadingText="Creating"
                   isDisabled={!isValid}
                 >
                   Create
                 </Button>
-                <Button variant="ghost" width="full" onClick={onClose} ml={2}>
+                <Button
+                  variant="ghost"
+                  width="full"
+                  onClick={handleClose}
+                  ml={2}
+                >
                   Cancel
                 </Button>
               </div>
@@ -330,5 +376,48 @@ const CustomDateInput = forwardRef<HTMLInputElement, InputProps>(
 );
 
 CustomDateInput.displayName = "DateInput";
+
+const Dropzone: FC<{
+  onChange: (imageURL: string) => void;
+  previewURL: string;
+  setFile: (file: File) => void;
+}> = ({ onChange, previewURL, setFile }) => {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      console.log(acceptedFiles);
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      const _previewURL = URL.createObjectURL(file);
+      setFile(file);
+      onChange(_previewURL);
+    },
+    multiple: false,
+    // accept: ["image/*"],
+    // accept: "images/*",
+  });
+
+  useEffect(() => {
+    return () => {
+      if (previewURL) URL.revokeObjectURL(previewURL);
+    };
+  }, [previewURL]);
+
+  return (
+    <div
+      {...getRootProps()}
+      className="mt-6 flex cursor-pointer justify-center rounded-md bg-[rgba(201,201,201,22%)] py-10 px-4"
+    >
+      <input {...getInputProps()} />
+      {previewURL ? (
+        <img src={previewURL} alt="Cover Image Preview" />
+      ) : isDragActive ? (
+        <p>{`Drop the image here ...`}</p>
+      ) : (
+        <p>{`Drag 'n' drop your cover image, or click to select the image`}</p>
+      )}
+    </div>
+  );
+};
 
 export default Watch;

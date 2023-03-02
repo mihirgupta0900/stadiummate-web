@@ -1,5 +1,4 @@
 import { createTRPCRouter } from "~/server/api/trpc";
-import { exampleRouter } from "~/server/api/routers/example";
 import { watchPartyRouter } from "./routers/watchPartyRouter";
 import { engagementRouter } from "./routers/engagementRouter";
 
@@ -9,7 +8,6 @@ import { engagementRouter } from "./routers/engagementRouter";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  example: exampleRouter,
   watchParty: watchPartyRouter,
   engagement: engagementRouter,
 });
