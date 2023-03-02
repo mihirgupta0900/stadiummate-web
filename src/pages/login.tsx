@@ -7,15 +7,22 @@ import {
 } from "firebase/auth";
 import { Button } from "@chakra-ui/react";
 import { useAuthState, useIdToken } from "react-firebase-hooks/auth";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import { BsGoogle } from "react-icons/bs";
 const Login = () => {
   const [isWindow, setIsWindow] = useState(false);
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
+  const router = useRouter();
 
   const login = async () => {
     const result = await signInWithPopup(auth, provider);
+    if (result.user) {
+      await router.push("/update");
+    } else {
+      console.log("error");
+    }
 
     console.log(result);
   };
