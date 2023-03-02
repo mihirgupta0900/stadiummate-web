@@ -1,3 +1,6 @@
+import { type AppType } from "next/app";
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 import {
   ChakraProvider,
   defineStyleConfig,
@@ -8,7 +11,6 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
-import { initFirebase } from "~/utils/firebase";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -55,15 +57,18 @@ const theme = extendTheme({
   },
 });
 
-initFirebase();
-
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
   return (
-    <main className={montserrat.className}>
-      <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </main>
+    <SessionProvider session={session}>
+      <main className={montserrat.className}>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </main>
+    </SessionProvider>
   );
 };
 

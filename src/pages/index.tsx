@@ -1,19 +1,18 @@
-import { getAuth } from "firebase/auth";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { BsGoogle } from "react-icons/bs";
-const Login = () => {
-  const auth = getAuth();
-  const router = useRouter();
 
-  const [signInWithGoogle] = useSignInWithGoogle(auth);
-  const [user] = useAuthState(auth);
+const Login = () => {
+  const router = useRouter();
+  const { data: user } = useSession();
 
   useEffect(() => {
-    if (user) void router.push("/update");
-  }, [user, router]);
+    if (user) {
+      void router.push("/watchparty");
+    }
+  }, [router, user]);
 
   return (
     <main className="login-bg flex h-screen w-screen flex-row  ">
@@ -27,10 +26,9 @@ const Login = () => {
 
         <button
           className="mt-2 flex items-center justify-center rounded-lg bg-white px-4 py-2 text-xl font-medium text-[#7267CB]"
-          onClick={() => signInWithGoogle()}
+          onClick={() => void router.push("/api/auth/signin")}
         >
-          <BsGoogle className="mr-1" />
-          <span className="ml-1">Login with Google</span>
+          <span className="ml-1">Login</span>
         </button>
       </section>
     </main>
