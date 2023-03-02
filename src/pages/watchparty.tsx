@@ -75,7 +75,7 @@ const Watch = () => {
     </Layout>
   );
 };
-+
+
 const Party: FC<{
   watchParty: RouterOutputs["watchParty"]["getAll"][number];
 }> = ({ watchParty: party }) => {

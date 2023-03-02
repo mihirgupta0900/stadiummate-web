@@ -1,13 +1,11 @@
-// components/Join.jsx
-
-import Image from "next/image";
-import { useState } from "react";
-import Avatar from "boring-avatars";
 import { useHMSActions } from "@100mslive/hms-video-react";
+import { Button } from "@chakra-ui/react";
+import Avatar from "boring-avatars";
+import { useState } from "react";
 
+import { api } from "~/utils/api";
 import NameInput from "./Join/NameInput";
 import RoleSelect from "./Join/RoleSelect";
-import JoinButton from "./Join/JoinButton";
 
 const Join = () => {
   const hmsActions = useHMSActions();
@@ -15,24 +13,17 @@ const Join = () => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("listener");
 
-  const joinRoom = async () => {
-    try {
-      const response = await fetch("/api/token", {
-        method: "POST",
-        body: JSON.stringify({ role }),
-      });
-      const { token } = await response.json();
-      hmsActions.join({
+  const joinMutation = api.voice.getToken.useMutation({
+    onSuccess: async ({ token }) => {
+      await hmsActions.join({
         userName: name || "Anonymous",
         authToken: token,
         settings: {
           isAudioMuted: true,
         },
       });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    },
+  });
 
   return (
     <main className="flex h-screen w-screen flex-col items-center justify-center gap-20">
@@ -43,7 +34,14 @@ const Join = () => {
         <RoleSelect role={role} setRole={setRole} />
         <div className="">
           {" "}
-          <JoinButton joinRoom={joinRoom} />
+          <Button
+            onClick={() => joinMutation.mutate({ role })}
+            width="full"
+            isLoading={joinMutation.isLoading}
+            // className=""
+          >
+            Join Room
+          </Button>
         </div>
       </div>
     </main>

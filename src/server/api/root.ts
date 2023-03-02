@@ -3,6 +3,7 @@ import { watchPartyRouter } from "./routers/watchPartyRouter";
 import { engagementRouter } from "./routers/engagementRouter";
 import { type NextApiRequest } from "next";
 import { prisma } from "../db";
+import { voiceRouter } from "./routers/voiceRouter";
 
 /**
  * This is the primary router for your server.
@@ -12,6 +13,7 @@ import { prisma } from "../db";
 export const appRouter = createTRPCRouter({
   watchParty: watchPartyRouter,
   engagement: engagementRouter,
+  voice: voiceRouter,
 });
 
 // export type definition of API

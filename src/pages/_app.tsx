@@ -61,7 +61,6 @@ initFirebase();
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const router = useRouter();
-  router.pathname;
   return (
     <main className={montserrat.className}>
       <ChakraProvider theme={theme}>
