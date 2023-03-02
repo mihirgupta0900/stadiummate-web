@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createWatchPartySchema } from "~/pages/watch";
+import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
