@@ -11,6 +11,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { initFirebase } from "~/utils/firebase";
 
+import Sidebar from "~/components/shared/Sidebar";
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -62,6 +63,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <main className={montserrat.className}>
       <ChakraProvider theme={theme}>
+        <Sidebar />
         <Component {...pageProps} />
       </ChakraProvider>
     </main>
