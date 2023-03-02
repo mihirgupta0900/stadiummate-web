@@ -1,17 +1,15 @@
-import { type AppType } from "next/app";
 import {
   ChakraProvider,
   defineStyleConfig,
   extendTheme,
 } from "@chakra-ui/react";
 import { Montserrat } from "@next/font/google";
-import { useRouter } from "next/router";
+import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import { initFirebase } from "~/utils/firebase";
 
-import Sidebar from "~/components/shared/Sidebar";
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -60,17 +58,9 @@ const theme = extendTheme({
 initFirebase();
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  const router = useRouter();
   return (
     <main className={montserrat.className}>
       <ChakraProvider theme={theme}>
-        {router.pathname.includes("login") ||
-        router.pathname.includes("voice") ? (
-          ""
-        ) : (
-          <Sidebar />
-        )}
-
         <Component {...pageProps} />
       </ChakraProvider>
     </main>
