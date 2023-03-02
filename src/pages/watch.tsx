@@ -83,6 +83,13 @@ const Party: FC<{
   const isAttendee = party.attendees.some(
     (attendee) => attendee.id === session?.user?.id
   );
+  const watchPartyUtils = api.useContext().watchParty;
+
+  const joinMutation = api.watchParty.join.useMutation({
+    onSuccess: async () => {
+      await watchPartyUtils.getAll.invalidate();
+    },
+  });
 
   return (
     <Card maxW="sm" bg="#F1F1F1" className="col-span-1 mx-auto">
@@ -143,6 +150,9 @@ const Party: FC<{
           mt="4"
           width={"full"}
           isDisabled={isHost || isAttendee}
+          onClick={() => joinMutation.mutate({ id: party.id })}
+          isLoading={joinMutation.isLoading}
+          loadingText="Joining"
           {...(isAttendee && { rightIcon: <CheckIcon /> })}
         >
           {isHost ? "You are host" : isAttendee ? "Joined" : "Join"}
