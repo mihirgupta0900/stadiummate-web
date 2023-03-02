@@ -27,8 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs",
-    "src/components/voice/Room/HandRaiseButton.jsx"
+    "**/*.mjs"
   ],
   "exclude": ["node_modules"]
 }

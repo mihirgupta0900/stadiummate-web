@@ -17,7 +17,7 @@ const Controls = () => {
   const peer = useHMSStore(selectLocalPeer);
 
   const isListenerOrHandraised =
-    peer.roleName === "listener" || peer.roleName === "handraise";
+    peer?.roleName === "listener" || peer?.roleName === "handraise";
 
   return (
     <div className="flex justify-center space-x-4">
@@ -30,7 +30,7 @@ const Controls = () => {
       {isListenerOrHandraised && (
         <HandRaiseButton
           isHandRaised={peer.roleName === "handraise"}
-          toggleHandRaise={() => {}}
+          toggleHandRaise={() => void 0}
         />
       )}
       <ExitButton exitRoom={() => hmsActions.leave()} />

@@ -25,6 +25,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.47.1
   autoprefixer: ^10.4.7
   boring-avatars: ^1.7.0
+  clsx: ^1.2.1
   eslint: ^8.30.0
   eslint-config-next: 13.1.6
   firebase: ^9.17.1
@@ -64,6 +65,7 @@ dependencies:
   '@trpc/react-query': 10.13.0_rdrc3kwtpssp5n4c2j5j4hbyvm
   '@trpc/server': 10.13.0
   boring-avatars: 1.7.0
+  clsx: 1.2.1
   firebase: 9.17.1
   firebase-admin: 11.5.0
   framer-motion: 10.0.1_biqbaboplfbrettd7655fr4n2y
