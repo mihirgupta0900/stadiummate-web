@@ -1,26 +1,45 @@
 import {
   Button,
-  ButtonGroup,
   Card,
   CardBody,
-  CardFooter,
-  Divider,
+  FormControl,
+  FormErrorMessage,
   Heading,
   Image as ChakraImage,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   Text,
+  useDisclosure,
+  type InputProps,
+  type UseDisclosureReturn,
 } from "@chakra-ui/react";
-import { FC } from "react";
-import Layout from "~/components/Layout";
 import Image from "next/image";
+import { forwardRef, type FC } from "react";
+import { Controller } from "react-hook-form";
+import { z } from "zod";
+import Layout from "~/components/Layout";
+import { api } from "~/utils/api";
+import { useZodForm } from "~/utils/form";
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Watch = () => {
+  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: true });
   return (
     <Layout>
+      <HostPartyModel {...rest} />
       <div className="mx-10 mt-10">
         <div className="flex justify-between">
           <h1 className="text-4xl font-semibold">Watch Party</h1>
-          <Button>Host a watch party</Button>
+          <Button onClick={onOpen}>Host a watch party</Button>
         </div>
         <p className="mt-4 text-[20px]">
           Experience the thrill of the game with like-minded fans at a local
@@ -105,5 +124,174 @@ const Party: FC = () => {
     </Card>
   );
 };
+
+export const createWatchPartySchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  location: z.string().min(1, { message: "Location is required" }),
+  time: z.date({
+    required_error: "Time is required",
+  }),
+  cost: z.number({
+    required_error: "Cost is required",
+    invalid_type_error: "Cost must be a number",
+  }),
+});
+
+const CustomInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
+  <Input
+    bg="rgba(201,201,201,22%)"
+    border="none"
+    _placeholder={{ color: "#989898" }}
+    color="white"
+    mt={6}
+    ref={ref}
+    size="lg"
+    {...props}
+  />
+));
+CustomInput.displayName = "CustomInput";
+
+const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
+  isOpen,
+  onClose,
+}) => {
+  const watchPartyUtils = api.useContext().watchParty;
+  const mutation = api.watchParty.create.useMutation({
+    onSuccess: async () => {
+      await watchPartyUtils.getAll.invalidate();
+      onClose();
+    },
+  });
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useZodForm({
+    schema: createWatchPartySchema,
+  });
+
+  return (
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent bg="#1C202D" color="white">
+          <ModalHeader mx={"auto"} mt={4}>
+            <Heading size="lg" fontWeight="regular">
+              Host a watch party
+            </Heading>
+          </ModalHeader>
+          {/* <ModalCloseButton /> */}
+          <ModalBody>
+            <form
+              className="mt-4"
+              onSubmit={(e) => {
+                handleSubmit((values) => {
+                  mutation.mutate(values);
+                  // console.log(values);
+                })(e).catch(() => {
+                  console.log(e);
+                });
+              }}
+            >
+              <FormControl isInvalid={!!errors.title}>
+                <CustomInput
+                  id="title"
+                  placeholder="Enter the title"
+                  {...register("title", {
+                    required: "Title is required",
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.title && errors.title.message}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl isInvalid={!!errors.location}>
+                <CustomInput
+                  id="location"
+                  placeholder="Enter the location"
+                  {...register("location", {
+                    required: "Location is required",
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.location && errors.location.message}
+                </FormErrorMessage>
+              </FormControl>{" "}
+              <FormControl isInvalid={!!errors.cost}>
+                <InputGroup mt={6} size="lg">
+                  <InputLeftElement pointerEvents="none" fontSize="1.2em">
+                    $
+                  </InputLeftElement>
+                  <Input
+                    color="white"
+                    border="none"
+                    bg="rgba(201,201,201,22%)"
+                    id="cost"
+                    type="number"
+                    size={"lg"}
+                    placeholder="Enter the cost"
+                    {...register("cost", {
+                      required: "Cost is required",
+                      valueAsNumber: true,
+                    })}
+                  />
+                </InputGroup>
+                <FormErrorMessage>
+                  {errors.cost && errors.cost.message}
+                </FormErrorMessage>
+              </FormControl>{" "}
+              <Controller
+                control={control}
+                name="time"
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <DatePicker
+                      minDate={new Date()}
+                      minTime={new Date()}
+                      maxTime={new Date(new Date().setHours(23, 59, 59, 999))}
+                      dateFormat="MMMM d, yyyy h:mm aa"
+                      selected={field.value}
+                      onChange={field.onChange}
+                      placeholderText={"Enter Time"}
+                      className="border border-black"
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      customInput={<CustomDateInput />}
+                    />
+                    <FormErrorMessage>
+                      {error && error.message}
+                    </FormErrorMessage>
+                  </>
+                )}
+              />
+              <div className="my-6 flex justify-between">
+                <Button
+                  colorScheme="blue"
+                  width="full"
+                  mr={2}
+                  type="submit"
+                  isLoading={mutation.isLoading}
+                  isDisabled={!isValid}
+                >
+                  Create
+                </Button>
+                <Button variant="ghost" width="full" onClick={onClose} ml={2}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
+const CustomDateInput = forwardRef<HTMLInputElement, InputProps>(
+  (props, ref) => <CustomInput ref={ref} {...props} />
+);
+
+CustomDateInput.displayName = "DateInput";
 
 export default Watch;
