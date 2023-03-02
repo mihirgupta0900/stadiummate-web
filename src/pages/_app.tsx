@@ -5,7 +5,7 @@ import {
   extendTheme,
 } from "@chakra-ui/react";
 import { Montserrat } from "@next/font/google";
-
+import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
@@ -60,10 +60,18 @@ const theme = extendTheme({
 initFirebase();
 
 const MyApp: AppType = ({ Component, pageProps }) => {
+  const router = useRouter();
+  router.pathname;
   return (
     <main className={montserrat.className}>
       <ChakraProvider theme={theme}>
-        <Sidebar />
+        {router.pathname.includes("login") ||
+        router.pathname.includes("voice") ? (
+          ""
+        ) : (
+          <Sidebar />
+        )}
+
         <Component {...pageProps} />
       </ChakraProvider>
     </main>
