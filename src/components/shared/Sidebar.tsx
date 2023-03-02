@@ -19,13 +19,13 @@ const Sidebar: FC = () => {
     ["experience", "/watchparty", "/icons/experience.svg"],
     ["voice", "/voice", "/icons/mic.svg"],
     // ["profile", "/profile", "/icons/profile.svg"],
-  ];
+  ] as const;
 
   const matchModeRoutes = [
     ["experience", "/engagement", "/icons/experience.svg"],
     ["moments", "/NFT", "/icons/nft.svg"],
     ["profile", "/profile", "/icons/profile.svg"],
-  ];
+  ] as const;
 
   const { data: session } = useSession();
   const router = useRouter();
