@@ -1,41 +1,55 @@
 import React, { FC, useState } from "react";
-import { Switch, FormControl, FormLabel } from "@chakra-ui/react";
+import {
+  Switch,
+  FormControl,
+  FormLabel,
+  Stack,
+  Text,
+  Button,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 const Sidebar: FC = () => {
   const [isMatchMode, setIsMatchMode] = useState(false);
-  const router = useRouter();
 
   const nonMatchModeRoutes = [
     ["Feed", "/update", "/icons/cricket.svg"],
     ["experience", "/watchparty", "/icons/experience.svg"],
-    ["voice", "https://stadium-mate.vercel.app/", "/icons/mic.svg"],
-    ["profile", "/profile", "/icons/profile.svg"],
-  ];
+    ["voice", "https://voice-stadiummate.vercel.app/", "/icons/mic.svg"],
+    // ["profile", "/profile", "/icons/profile.svg"],
+  ] as const;
 
   const matchModeRoutes = [
-    ["experience", "/engagement", "/icons/feed.svg"],
+    ["experience", "/engagement", "/icons/experience.svg"],
     ["moments", "/NFT", "/icons/nft.svg"],
     ["profile", "/profile", "/icons/profile.svg"],
-  ];
+  ] as const;
+
+  const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <div>
-      <nav className=" fixed  h-screen bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:w-[17vw] lg:min-w-[17vw] ">
+      <nav className="fixed top-0 left-0 hidden h-screen overflow-auto bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]">
         <div id="logo">
           <div className="flex h-20 w-20 items-center justify-center rounded-full  ">
             <Image src="/icons/logo.svg" alt="logo" width={50} height={50} />
           </div>
         </div>
         <div>
-          <button className="">
+          <div className="ml-4 text-white">
+            {/* <button className=""> */}
+            {isMatchMode ? "Match Mode" : "Normal Mode"}
             <Switch
+              ml={2}
               onChange={() => {
                 setIsMatchMode(!isMatchMode);
               }}
             />
-          </button>
+          </div>
+          {/* </button> */}
           <ul>
             {isMatchMode
               ? matchModeRoutes.map(([route, link, img]) => (
@@ -59,6 +73,41 @@ const Sidebar: FC = () => {
                   </li>
                 ))}
           </ul>
+          {session ? (
+            <div className="mx-4">
+              <Stack color="white" mt={4}>
+                <Text fontSize={"lg"}>{session.user.name}</Text>
+                <Text fontSize={"sm"}>{session.user.email}</Text>
+              </Stack>
+              <Button
+                variant="outline"
+                mt={4}
+                color="white"
+                width={"full"}
+                _hover={{
+                  bg: "none",
+                }}
+                onClick={() => void router.push("/api/auth/signout")}
+              >
+                Signout
+              </Button>
+            </div>
+          ) : (
+            <div className="mx-4">
+              <Button
+                variant="outline"
+                mt={4}
+                color="white"
+                width={"full"}
+                _hover={{
+                  bg: "none",
+                }}
+                onClick={() => void router.push("/api/auth/signin")}
+              >
+                Login
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
     </div>

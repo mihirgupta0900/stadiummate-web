@@ -15,11 +15,13 @@
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type Session } from "next-auth";
 
+import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
 type CreateContextOptions = {
-  idToken: DecodedIdToken | null;
+  session: Session | null;
 };
 
 /**
@@ -34,21 +36,9 @@ type CreateContextOptions = {
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
-    idToken: opts.idToken,
+    session: opts.session,
     prisma,
   };
-};
-
-export const getFirebaseUserFromHeader = async (req: NextApiRequest) => {
-  const token = req.headers.authorization?.split("Bearer ")[1];
-  if (!token) return null;
-
-  try {
-    const decodedToken = await getAuth().verifyIdToken(token);
-    return decodedToken;
-  } catch (error) {
-    return null;
-  }
 };
 
 /**
@@ -58,12 +48,13 @@ export const getFirebaseUserFromHeader = async (req: NextApiRequest) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req } = opts;
+  const { req, res } = opts;
 
-  const decodedIdToken = await getFirebaseUserFromHeader(req);
+  // Get the session from the server using the getServerSession wrapper function
+  const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
-    idToken: decodedIdToken,
+    session,
   });
 };
 
@@ -73,20 +64,14 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * This is where the tRPC API is initialized, connecting the context and transformer.
  */
 import { initTRPC, TRPCError } from "@trpc/server";
-import { type DecodedIdToken, getAuth } from "firebase-admin/auth";
-import { type NextApiRequest } from "next";
 import superjson from "superjson";
-import { type OpenApiMeta } from "trpc-openapi";
 
-const t = initTRPC
-  .meta<OpenApiMeta>()
-  .context<typeof createTRPCContext>()
-  .create({
-    transformer: superjson,
-    errorFormatter({ shape }) {
-      return shape;
-    },
-  });
+const t = initTRPC.context<typeof createTRPCContext>().create({
+  transformer: superjson,
+  errorFormatter({ shape }) {
+    return shape;
+  },
+});
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -112,28 +97,14 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
-const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.idToken) {
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-
-  const user = await prisma.user.upsert({
-    where: {
-      id: ctx.idToken.uid,
-    },
-    update: {},
-    create: {
-      id: ctx.idToken.uid,
-      email: ctx.idToken.email,
-      name: ctx.idToken?.name as string | undefined,
-      image: ctx.idToken.picture,
-    },
-  });
-
   return next({
     ctx: {
-      idToken: ctx.idToken,
-      user,
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
     },
   });
 });

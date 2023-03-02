@@ -9,6 +9,9 @@ module.exports = {
       parserOptions: {
         project: "tsconfig.json",
       },
+      rules: {
+        "@typescript-eslint/no-misused-promises": ["warn"],
+      },
     },
   ],
   parser: "@typescript-eslint/parser",

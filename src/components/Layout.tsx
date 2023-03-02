@@ -3,10 +3,13 @@ import Sidebar from "./shared/Sidebar";
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div className="grid h-[100vh] w-full grid-cols-6">
+    <>
       <Sidebar />
-      <div className="col-span-6  lg:col-span-5">{children}</div>
-    </div>
+      <div className="grid h-[100vh] w-full grid-cols-6">
+        <div className="col-span-1 hidden lg:block"></div>
+        <div className="col-span-6 lg:col-span-5">{children}</div>
+      </div>
+    </>
   );
 };
 

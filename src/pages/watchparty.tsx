@@ -19,6 +19,7 @@ import {
   Stack,
   Text,
   useDisclosure,
+  useToast,
   type InputProps,
   type UseDisclosureReturn,
 } from "@chakra-ui/react";
@@ -31,12 +32,11 @@ import Layout from "~/components/Layout";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useZodForm } from "~/utils/form";
 
+import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDropzone } from "react-dropzone";
 import { env } from "~/env.mjs";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { getAuth } from "firebase/auth";
 
 const Watch = () => {
   const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
@@ -79,12 +79,11 @@ const Watch = () => {
 const Party: FC<{
   watchParty: RouterOutputs["watchParty"]["getAll"][number];
 }> = ({ watchParty: party }) => {
-  const auth = getAuth();
-  const [user] = useAuthState(auth);
-  const isHost = party.hostId === user?.uid;
+  const toast = useToast();
+  const { data: session } = useSession();
+  const isHost = party.hostId === session?.user?.id;
   const isAttendee = party.attendees.some(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (attendee) => attendee.id === user?.uid
+    (attendee) => attendee.id === session?.user?.id
   );
   const isFull = party.attendees.length === party.capacity;
   const watchPartyUtils = api.useContext().watchParty;
@@ -92,6 +91,12 @@ const Party: FC<{
   const joinMutation = api.watchParty.join.useMutation({
     onSuccess: async () => {
       await watchPartyUtils.getAll.invalidate();
+      toast({
+        title: `Joined ${party.title}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     },
   });
 
@@ -223,9 +228,16 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
   isOpen,
   onClose,
 }) => {
+  const toast = useToast();
   const watchPartyUtils = api.useContext().watchParty;
   const mutation = api.watchParty.create.useMutation({
     onSuccess: async () => {
+      toast({
+        title: "Watch party created",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
       await watchPartyUtils.getAll.invalidate();
       onClose();
     },
