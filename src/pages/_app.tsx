@@ -1,11 +1,10 @@
-import { type AppType } from "next/app";
 import {
   ChakraProvider,
   defineStyleConfig,
   extendTheme,
 } from "@chakra-ui/react";
 import { Montserrat } from "@next/font/google";
-
+import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
