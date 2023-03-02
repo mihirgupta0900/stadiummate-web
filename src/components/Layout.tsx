@@ -5,9 +5,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className="grid h-[100vh] w-full grid-cols-6">
       <Sidebar />
-      <div className="col-span-6 border border-red-700 lg:col-span-5">
-        {children}
-      </div>
+      <div className="col-span-6  lg:col-span-5">{children}</div>
     </div>
   );
 };
