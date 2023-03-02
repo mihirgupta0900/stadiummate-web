@@ -22,7 +22,7 @@ const Sidebar: FC = () => {
 
   return (
     <div>
-      <nav className=" fixed  h-screen bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:w-[17vw] lg:min-w-[17vw] ">
+      <nav className="fixed top-0 left-0 hidden h-screen overflow-auto bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]">
         <div id="logo">
           <div className="flex h-20 w-20 items-center justify-center rounded-full  ">
             <Image src="/icons/logo.svg" alt="logo" width={50} height={50} />
