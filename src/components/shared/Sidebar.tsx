@@ -1,17 +1,24 @@
 import React, { FC, useState } from "react";
-import { Switch, FormControl, FormLabel } from "@chakra-ui/react";
+import {
+  Switch,
+  FormControl,
+  FormLabel,
+  Stack,
+  Text,
+  Button,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 const Sidebar: FC = () => {
   const [isMatchMode, setIsMatchMode] = useState(false);
-  const router = useRouter();
 
   const nonMatchModeRoutes = [
     ["Feed", "/update", "/icons/cricket.svg"],
     ["experience", "/watchparty", "/icons/experience.svg"],
     ["voice", "/voice", "/icons/mic.svg"],
-    ["profile", "/profile", "/icons/profile.svg"],
+    // ["profile", "/profile", "/icons/profile.svg"],
   ];
 
   const matchModeRoutes = [
@@ -19,6 +26,9 @@ const Sidebar: FC = () => {
     ["moments", "/NFT", "/icons/nft.svg"],
     ["profile", "/profile", "/icons/profile.svg"],
   ];
+
+  const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <div>
@@ -29,13 +39,17 @@ const Sidebar: FC = () => {
           </div>
         </div>
         <div>
-          <button className="">
+          <div className="ml-4 text-white">
+            {/* <button className=""> */}
+            {isMatchMode ? "Match Mode" : "Normal Mode"}
             <Switch
+              ml={2}
               onChange={() => {
                 setIsMatchMode(!isMatchMode);
               }}
             />
-          </button>
+          </div>
+          {/* </button> */}
           <ul>
             {isMatchMode
               ? matchModeRoutes.map(([route, link, img]) => (
@@ -59,6 +73,41 @@ const Sidebar: FC = () => {
                   </li>
                 ))}
           </ul>
+          {session ? (
+            <div className="mx-4">
+              <Stack color="white" mt={4}>
+                <Text fontSize={"lg"}>{session.user.name}</Text>
+                <Text fontSize={"sm"}>{session.user.email}</Text>
+              </Stack>
+              <Button
+                variant="outline"
+                mt={4}
+                color="white"
+                width={"full"}
+                _hover={{
+                  bg: "none",
+                }}
+                onClick={() => void router.push("/api/auth/signout")}
+              >
+                Signout
+              </Button>
+            </div>
+          ) : (
+            <div className="mx-4">
+              <Button
+                variant="outline"
+                mt={4}
+                color="white"
+                width={"full"}
+                _hover={{
+                  bg: "none",
+                }}
+                onClick={() => void router.push("/api/auth/signin")}
+              >
+                Login
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
     </div>
