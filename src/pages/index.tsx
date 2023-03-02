@@ -1,18 +1,12 @@
+import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { Button } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { BsGoogle } from "react-icons/bs";
 
 const Login = () => {
   const router = useRouter();
-  const { data: user } = useSession();
-
-  useEffect(() => {
-    if (user) {
-      void router.push("/watchparty");
-    }
-  }, [router, user]);
+  const { data: session } = useSession();
 
   return (
     <main className="login-bg flex h-screen w-screen flex-row  ">
@@ -23,13 +17,29 @@ const Login = () => {
           “A must have app for cricket fans, No matter if you are going to the
           match or not”
         </p>
-
-        <button
-          className="mt-2 flex items-center justify-center rounded-lg bg-white px-4 py-2 text-xl font-medium text-[#7267CB]"
-          onClick={() => void router.push("/api/auth/signin")}
-        >
-          <span className="ml-1">Login</span>
-        </button>
+        {session ? (
+          <Button
+            mt={2}
+            bg="white"
+            color="#7267CB"
+            _hover={{
+              bg: "white",
+              color: "#7267CB",
+            }}
+            fontWeight="medium"
+            onClick={() => void router.push("/watchparty")}
+            rightIcon={<ArrowForwardIcon />}
+          >
+            Experience
+          </Button>
+        ) : (
+          <button
+            className="mt-2 flex items-center justify-center rounded-lg bg-white px-4 py-2 text-xl font-medium text-[#7267CB]"
+            onClick={() => void router.push("/api/auth/signin")}
+          >
+            <span className="ml-1">Login</span>
+          </button>
+        )}
       </section>
     </main>
   );
