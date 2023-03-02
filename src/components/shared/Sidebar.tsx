@@ -17,7 +17,7 @@ const Sidebar: FC = () => {
   const nonMatchModeRoutes = [
     ["Feed", "/update", "/icons/cricket.svg"],
     ["experience", "/watchparty", "/icons/experience.svg"],
-    ["voice", "/voice", "/icons/mic.svg"],
+    ["voice", "https://voice-stadiummate.vercel.app/", "/icons/mic.svg"],
     // ["profile", "/profile", "/icons/profile.svg"],
   ] as const;
 
