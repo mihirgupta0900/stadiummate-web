@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
@@ -41,10 +42,20 @@ export const watchPartyRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+        include: {
+          attendees: true,
+        },
       });
 
       if (!watchParty) {
         throw new Error("Watch party not found");
+      }
+
+      if (watchParty.capacity <= watchParty.attendees.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Watch party is full",
+        });
       }
 
       await prisma.watchParty.update({

@@ -38,7 +38,7 @@ import { useDropzone } from "react-dropzone";
 import { env } from "~/env.mjs";
 
 const Watch = () => {
-  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: true });
+  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
   const { data: watchParties, isLoading } = api.watchParty.getAll.useQuery();
 
   return (
@@ -83,6 +83,7 @@ const Party: FC<{
   const isAttendee = party.attendees.some(
     (attendee) => attendee.id === session?.user?.id
   );
+  const isFull = party.attendees.length === party.capacity;
   const watchPartyUtils = api.useContext().watchParty;
 
   const joinMutation = api.watchParty.join.useMutation({
@@ -142,20 +143,28 @@ const Party: FC<{
                 alt="People Icon"
                 className="mr-2"
               />
-              <Text color="#595959">{party.attendees.length}/90</Text>
+              <Text color="#595959">
+                {party.attendees.length}/{party.capacity}
+              </Text>
             </div>
           </div>
         </Stack>
         <Button
           mt="4"
           width={"full"}
-          isDisabled={isHost || isAttendee}
+          isDisabled={isHost || isAttendee || isFull}
           onClick={() => joinMutation.mutate({ id: party.id })}
           isLoading={joinMutation.isLoading}
           loadingText="Joining"
           {...(isAttendee && { rightIcon: <CheckIcon /> })}
         >
-          {isHost ? "You are host" : isAttendee ? "Joined" : "Join"}
+          {isHost
+            ? "You are host"
+            : isAttendee
+            ? "Joined"
+            : isFull
+            ? "Party at capacity"
+            : "Join"}
         </Button>
       </CardBody>
     </Card>
@@ -344,13 +353,13 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
               />
               <div className="my-6 flex justify-between">
                 <Button
-                  colorScheme="blue"
                   width="full"
                   mr={2}
                   type="submit"
                   isLoading={isSubmitting}
                   loadingText="Creating"
                   isDisabled={!isValid}
+                  _disabled={{ bg: "gray.600" }}
                 >
                   Create
                 </Button>
