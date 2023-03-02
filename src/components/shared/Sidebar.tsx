@@ -22,7 +22,7 @@ const Sidebar: FC = () => {
   ];
 
   const matchModeRoutes = [
-    ["experience", "/engagement", "/icons/feed.svg"],
+    ["experience", "/engagement", "/icons/experience.svg"],
     ["moments", "/NFT", "/icons/nft.svg"],
     ["profile", "/profile", "/icons/profile.svg"],
   ];
