@@ -19,20 +19,25 @@ import {
   useDisclosure,
   type InputProps,
   type UseDisclosureReturn,
+  Spinner,
+  Skeleton,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { forwardRef, type FC } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
 import Layout from "~/components/Layout";
-import { api } from "~/utils/api";
+import { api, RouterOutputs } from "~/utils/api";
 import { useZodForm } from "~/utils/form";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { WatchParty } from "@prisma/client";
 
 const Watch = () => {
-  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: true });
+  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
+  const { data: watchParties, isLoading } = api.watchParty.getAll.useQuery();
+
   return (
     <Layout>
       <HostPartyModel {...rest} />
@@ -48,22 +53,30 @@ const Watch = () => {
         </p>
         <div className="mt-14">
           <h2 className="text-[32px] font-medium">Watch Parties Near You</h2>
-          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Party />
-            <Party />
-            <Party />
-            <Party />
-            <Party />
-            <Party />
-            <Party />
-          </div>
+          {/* <div className="mt-10"> */}
+          {isLoading || !watchParties ? (
+            <Stack mt={4}>
+              <Skeleton height="50px" />
+              <Skeleton height="50px" />
+              <Skeleton height="50px" />
+            </Stack>
+          ) : (
+            <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {watchParties.map((party) => (
+                <Party key={party.id} watchParty={party} />
+              ))}
+            </div>
+          )}
+          {/* </div> */}
         </div>
       </div>
     </Layout>
   );
 };
 
-const Party: FC = () => {
+const Party: FC<{
+  watchParty: RouterOutputs["watchParty"]["getAll"][number];
+}> = ({ watchParty: party }) => {
   return (
     <Card maxW="sm" bg="#F1F1F1" className="col-span-1 mx-auto">
       <ChakraImage
@@ -73,7 +86,7 @@ const Party: FC = () => {
       />
       <CardBody>
         <Stack spacing="3">
-          <Heading size="md">The Bliss Cafe</Heading>
+          <Heading size="md">{party.title}</Heading>
           <div className="flex items-center">
             <Image
               src="/icons/cricket.png"
@@ -82,7 +95,9 @@ const Party: FC = () => {
               alt="Cricket Icon"
               className="mr-2"
             />
-            <Text color="#595959">Ind vs Aus . 6:30 PM</Text>
+            <Text color="#595959">
+              Ind vs Aus . {party.time.toLocaleString()}
+            </Text>
           </div>
           <div className="flex items-center">
             <Image
@@ -92,7 +107,7 @@ const Party: FC = () => {
               alt="Location Icon"
               className="mr-2"
             />
-            <Text color="#595959">Estancia 2131</Text>
+            <Text color="#595959">{party.location}</Text>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -103,7 +118,7 @@ const Party: FC = () => {
                 alt="Ticket Icon"
                 className="mr-2"
               />
-              <Text color="#595959">$10</Text>
+              <Text color="#595959">${party.cost}</Text>
             </div>
             <div className="flex items-center">
               <Image
@@ -113,7 +128,7 @@ const Party: FC = () => {
                 alt="People Icon"
                 className="mr-2"
               />
-              <Text color="#595959">20/90</Text>
+              <Text color="#595959">{party.attendees.length}/90</Text>
             </div>
           </div>
         </Stack>
@@ -272,6 +287,7 @@ const HostPartyModel: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
                   mr={2}
                   type="submit"
                   isLoading={mutation.isLoading}
+                  loadingText="Creating"
                   isDisabled={!isValid}
                 >
                   Create
