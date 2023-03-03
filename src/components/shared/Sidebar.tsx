@@ -24,7 +24,7 @@ type SidebarItem = {
 const items: SidebarItem[] = [
   {
     label: "Feed",
-    route: "/update",
+    route: "/feed",
     icon: "/icons/cricket.svg",
     isMatchMode: false,
   },
