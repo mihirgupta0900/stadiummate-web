@@ -4,6 +4,7 @@ specifiers:
   '@100mslive/hms-video': ^0.7.4
   '@100mslive/hms-video-react': ^0.7.4
   '@chakra-ui/icons': ^2.0.17
+  '@chakra-ui/next-js': ^2.0.1
   '@chakra-ui/react': ^2.5.1
   '@emotion/react': ^11.10.6
   '@emotion/styled': ^11.10.6
@@ -34,6 +35,7 @@ specifiers:
   framer-motion: ^10.0.1
   next: 13.1.6
   next-auth: ^4.19.0
+  next-query-params: ^4.1.0
   postcss: ^8.4.14
   prettier: ^2.8.1
   prettier-plugin-tailwindcss: ^0.2.1
@@ -48,6 +50,7 @@ specifiers:
   tailwindcss: ^3.2.0
   trpc-openapi: ^1.1.2
   typescript: ^4.9.4
+  use-query-params: ^2.2.0
   uuid: ^9.0.0
   zod: ^3.20.6
 
@@ -55,6 +58,7 @@ dependencies:
   '@100mslive/hms-video': 0.7.4
   '@100mslive/hms-video-react': 0.7.4_fleixqh4h74dmdivs7fx6vtiqe
   '@chakra-ui/icons': 2.0.17_react@18.2.0
+  '@chakra-ui/next-js': 2.0.1_6agaatj3tf3foi3z56oksiwkwu
   '@chakra-ui/react': 2.5.1_llidv3byuxn3l2nsibklt32qgu
   '@emotion/react': 11.10.6_pmekkgnqduwlme35zpnqhenc34
   '@emotion/styled': 11.10.6_oouaibmszuch5k64ms7uxp2aia
@@ -73,6 +77,7 @@ dependencies:
   framer-motion: 10.0.1_biqbaboplfbrettd7655fr4n2y
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.20.1_3vryta7zmbcsw4rrqf4axjqggm
+  next-query-params: 4.1.0_kxwbbzh4agphvfcz5jwanvdjty
   react: 18.2.0
   react-datepicker: 4.10.0_biqbaboplfbrettd7655fr4n2y
   react-dom: 18.2.0_react@18.2.0
@@ -81,6 +86,7 @@ dependencies:
   react-icons: 4.7.1_react@18.2.0
   superjson: 1.9.1
   trpc-openapi: 1.1.2_yhu75clcihur65ia3myjyulsrm
+  use-query-params: 2.2.0_biqbaboplfbrettd7655fr4n2y
   uuid: 9.0.0
   zod: 3.20.6
 
@@ -614,6 +620,21 @@ packages:
       react-remove-scroll: 2.5.5_pmekkgnqduwlme35zpnqhenc34
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /@chakra-ui/next-js/2.0.1_6agaatj3tf3foi3z56oksiwkwu:
+    resolution: {integrity: sha512-LuVLb94chGB4fCszfmkh7ZYv3BsID7w5/Unr3HDe85cN4F+1AMkkhbBaZQiyIoqjCMD5hYj6R31DD4nDu+RI/Q==}
+    peerDependencies:
+      '@chakra-ui/react': '>=2.4.0'
+      '@emotion/react': '>=11'
+      next: '>=13'
+      react: '>=18'
+    dependencies:
+      '@chakra-ui/react': 2.5.1_llidv3byuxn3l2nsibklt32qgu
+      '@emotion/cache': 11.10.5
+      '@emotion/react': 11.10.6_pmekkgnqduwlme35zpnqhenc34
+      next: 13.1.6_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
     dev: false
 
   /@chakra-ui/number-input/2.0.18_n3dxrjldmk5gnycgnw7noyo5tu:
@@ -4358,6 +4379,19 @@ packages:
       uuid: 8.3.2
     dev: false
 
+  /next-query-params/4.1.0_kxwbbzh4agphvfcz5jwanvdjty:
+    resolution: {integrity: sha512-jjoQByM9s2d4wCUBUazhgHNVztm18meCtVoDj6v45+LZIQfxAF5QYVFKCbDYarI3iXD4xcZprztqLtALiiV8nQ==}
+    peerDependencies:
+      next: ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      use-query-params: ^2.0.0
+    dependencies:
+      next: 13.1.6_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      tslib: 2.5.0
+      use-query-params: 2.2.0_biqbaboplfbrettd7655fr4n2y
+    dev: false
+
   /next/13.1.6_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-hHlbhKPj9pW+Cymvfzc15lvhaOZ54l+8sXDXJWm3OBNBzgrVj6hwGPmqqsXg40xO1Leq+kXpllzRPuncpC0Phw==}
     engines: {node: '>=14.6.0'}
@@ -5361,6 +5395,10 @@ packages:
       lru-cache: 6.0.0
     dev: true
 
+  /serialize-query-params/2.0.2:
+    resolution: {integrity: sha512-1chMo1dST4pFA9RDXAtF0Rbjaut4is7bzFbI1Z26IuMub68pNCILku85aYmeFhvnY//BXUPUhoRMjYcsT93J/Q==}
+    dev: false
+
   /setprototypeof/1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
     dev: false
@@ -5827,6 +5865,17 @@ packages:
       '@types/react': 18.0.28
       react: 18.2.0
       tslib: 2.5.0
+    dev: false
+
+  /use-query-params/2.2.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-MPBwXVZYzFeJEdjv0YgPNFsafUOM8WTpwBEZfNEMlyzbTsf2c+ZpOBkdM95/w4rxzk4eVO3E4DW7v33+VDbiQw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      serialize-query-params: 2.0.2
     dev: false
 
   /use-sidecar/1.1.2_pmekkgnqduwlme35zpnqhenc34:
