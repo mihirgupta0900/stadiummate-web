@@ -13,6 +13,7 @@ import Link from "next/link";
 import { type FC } from "react";
 import { BsGoogle } from "react-icons/bs";
 import useIsMatchMode from "~/hooks/useIsMatchMode";
+import { clsx } from "clsx";
 
 type SidebarItem = {
   label: string;
@@ -24,7 +25,7 @@ type SidebarItem = {
 const items: SidebarItem[] = [
   {
     label: "Feed",
-    route: "/update",
+    route: "/feed",
     icon: "/icons/cricket.svg",
     isMatchMode: false,
   },
@@ -63,9 +64,18 @@ const Sidebar: FC = () => {
     (item) => item.isMatchMode === isMatchMode
   );
 
+  //turn box red when isMachedMode is true
+  const bgColor = isMatchMode ? "bg-red-400" : "bg-gray-100";
+
   return (
     <div>
-      <nav className="fixed top-0 left-0 hidden h-screen overflow-auto bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]">
+      <nav
+        className={`${
+          isMatchMode
+            ? "fixed top-0 left-0 hidden h-screen overflow-auto  bg-[#DC3546] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]"
+            : "fixed top-0 left-0 hidden h-screen overflow-auto bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]"
+        }`}
+      >
         <div id="logo">
           <div className="flex h-20 w-20 items-center justify-center rounded-full  ">
             <Image src="/icons/logo.svg" alt="logo" width={50} height={50} />
@@ -93,7 +103,13 @@ const Sidebar: FC = () => {
                   }}
                   key={item.route}
                 >
-                  <ListItem className="mx-2 flex cursor-pointer items-center rounded-md px-2 py-4 text-white hover:bg-indigo-400">
+                  <ListItem
+                    className={clsx(
+                      isMatchMode
+                        ? "mx-2 flex cursor-pointer items-center rounded-md px-2 py-4 text-white hover:bg-red-400"
+                        : "mx-2 flex cursor-pointer items-center rounded-md px-2 py-4 text-white hover:bg-indigo-400"
+                    )}
+                  >
                     <ListIcon
                       as={() => (
                         // eslint-disable-next-line @next/next/no-img-element
