@@ -21,8 +21,8 @@ const server = z.object({
   // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
-  TOKEN_ENDPOINT: z.string().min(1),
-  ROOM_ID: z.string().min(1),
+  WALLET_PRIVATE_KEY: z.string().min(1),
+  NEXT_PUBLIC_RPC_URL: z.string().min(1),
 });
 
 /**
@@ -48,8 +48,8 @@ const processEnv = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  TOKEN_ENDPOINT: process.env.TOKEN_ENDPOINT,
-  ROOM_ID: process.env.ROOM_ID,
+  WALLET_PRIVATE_KEY: process.env.WALLET_PRIVATE_KEY,
+  NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
     process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
   NEXT_PUBLIC_CLOUDINARY_CLOUD_ID: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_ID,

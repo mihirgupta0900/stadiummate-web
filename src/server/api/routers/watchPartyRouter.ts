@@ -1,7 +1,9 @@
 import { TRPCError } from "@trpc/server";
+import { type Address } from "abitype";
 import { z } from "zod";
 import { createWatchPartySchema } from "~/pages/watchparty";
 import { prisma } from "~/server/db";
+import { mintToken } from "~/utils/fanToken";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const watchPartyRouter = createTRPCRouter({
@@ -30,8 +32,25 @@ export const watchPartyRouter = createTRPCRouter({
         },
       });
 
-      // award token
+      // const user = await prisma.user.findUnique({
+      //   where: {
+      //     id: ctx.session.user.id,
+      //   },
+      //   select: {
+      //     walletAddress: true,
+      //   },
+      // });
 
+      // let txHash: string | undefined;
+      // if (user?.walletAddress) {
+      //   const tx = await mintToken(
+      //     user.walletAddress as Address,
+      //     BigInt(10e18)
+      //   );
+      //   txHash = tx.hash;
+      // }
+
+      // return { watchParty, txHash };
       return watchParty;
     }),
 
@@ -72,5 +91,26 @@ export const watchPartyRouter = createTRPCRouter({
       });
 
       // award token
+      const user = await prisma.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          walletAddress: true,
+        },
+      });
+
+      let txHash: string | undefined;
+      if (user?.walletAddress) {
+        const tx = await mintToken(
+          user.walletAddress as Address,
+          BigInt(10e18)
+        );
+        txHash = tx.hash;
+      }
+
+      return {
+        txHash,
+      };
     }),
 });
