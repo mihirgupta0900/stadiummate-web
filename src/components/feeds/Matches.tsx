@@ -1,34 +1,35 @@
 import React from "react";
 import Image from "next/image";
+const matchData = [
+  {
+    id: 1,
+    name: "India vs AUstralia",
+    date: "2021-10-10",
+    time: "10:00",
+    venue: "M Chinnaswamy Stadium, Bengaluru",
+    status: "Upcoming",
+    team1Name: "India",
+    team2Name: "Australia",
+    occation: "18th Match, Group B. ICC T20 World Cup",
+    team1: "/icons/ind.svg",
+    team2: "/icons/aus.svg",
+  },
+  {
+    id: 2,
+    name: "Zimbabwe vs South Africa",
+    date: "2021-10-10",
+    time: "15:00",
+    venue: "M Chinnaswamy Stadium, Bengaluru",
+    status: "Upcoming",
+    team1Name: "Zimbabwe",
+    team2Name: "South Africa",
+    occation: "18th Match, Group B. ICC T20 World Cup",
+    team1: "/icons/aim.svg",
+    team2: "/icons/saf.svg",
+  },
+] as const;
+
 const Matches = () => {
-  const matchData = [
-    {
-      id: 1,
-      name: "India vs AUstralia",
-      date: "2021-10-10",
-      time: "10:00",
-      venue: "M Chinnaswamy Stadium, Bengaluru",
-      status: "Upcoming",
-      team1Name: "India",
-      team2Name: "Australia",
-      occation: "18th Match, Group B. ICC T20 World Cup",
-      team1: "/icons/ind.svg",
-      team2: "/icons/aus.svg",
-    },
-    {
-      id: 2,
-      name: "Zimbabwe vs South Africa",
-      date: "2021-10-10",
-      time: "15:00",
-      venue: "M Chinnaswamy Stadium, Bengaluru",
-      status: "Upcoming",
-      team1Name: "Zimbabwe",
-      team2Name: "South Africa",
-      occation: "18th Match, Group B. ICC T20 World Cup",
-      team1: "/icons/aim.svg",
-      team2: "/icons/saf.svg",
-    },
-  ];
   return (
     <div>
       <h1 className="text-xl font-semibold text-gray-700 ">Matches</h1>
