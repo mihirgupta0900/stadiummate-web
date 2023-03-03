@@ -42,11 +42,8 @@ const Trivia = () => {
   const [visbile, setVisible] = useState(false);
   const [finalAnswer, setFinalAnswer] = useState("");
 
-  const watchPartyUtils = api.useContext().watchParty;
-
-  const joinMutation = api.watchParty.join.useMutation({
-    onSuccess: async ({ txHash }) => {
-      await watchPartyUtils.getAll.invalidate();
+  const awardTokenMutation = api.user.awardToken.useMutation({
+    onSuccess: ({ txHash }) => {
       toast({
         title: "Congratulations!",
         description: txHash && `You earned 10 tokens! TxHash: ${txHash}`,
@@ -59,6 +56,7 @@ const Trivia = () => {
       }
     },
   });
+
   return (
     <div>
       <h1 className="px-[5%] pt-[5%] text-2xl font-medium ">
@@ -97,9 +95,9 @@ const Trivia = () => {
                           setCounter(counter + 1);
                           setFinalAnswer("");
                         }, 7000);
-                        joinMutation.mutate({ id: item.id.toString() });
+                        awardTokenMutation.mutate();
                       }}
-                      isLoading={joinMutation.isLoading}
+                      isLoading={awardTokenMutation.isLoading}
                     >
                       Submit Answer
                     </Button>
