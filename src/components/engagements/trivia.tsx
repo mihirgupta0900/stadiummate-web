@@ -93,7 +93,10 @@ const Trivia = () => {
                     <Button
                       onClick={() => {
                         setFinalAnswer(markedAnswer);
-
+                        setTimeout(() => {
+                          setCounter(counter + 1);
+                          setFinalAnswer("");
+                        }, 7000);
                         joinMutation.mutate({ id: item.id.toString() });
                       }}
                       isLoading={joinMutation.isLoading}
