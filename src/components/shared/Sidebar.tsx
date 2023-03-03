@@ -70,12 +70,12 @@ const items: SidebarItem[] = [
     icon: "/icons/experience.svg",
     isMatchMode: true,
   },
-  {
-    label: "moments",
-    route: "/NFT",
-    icon: "/icons/nft.svg",
-    isMatchMode: true,
-  },
+  // {
+  //   label: "moments",
+  //   route: "/NFT",
+  //   icon: "/icons/nft.svg",
+  //   isMatchMode: true,
+  // },
 ];
 
 const Sidebar: FC = () => {
