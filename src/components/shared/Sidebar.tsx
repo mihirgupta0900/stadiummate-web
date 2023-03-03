@@ -76,10 +76,15 @@ const Sidebar: FC = () => {
             : "fixed top-0 left-0 hidden h-screen overflow-auto bg-[#7267CB] md:w-[17vw] md:min-w-[17vw] lg:block lg:w-[17vw] lg:min-w-[17vw]"
         }`}
       >
-        <div id="logo">
+        <div className="flex flex-row items-center" id="logo">
           <div className="flex h-20 w-20 items-center justify-center rounded-full  ">
             <Image src="/icons/logo.svg" alt="logo" width={50} height={50} />
           </div>
+          {isMatchMode ? (
+            <p className="mx-2 font-medium text-white">MatchMode</p>
+          ) : (
+            ""
+          )}
         </div>
         <div>
           <div className="ml-4 text-white">
