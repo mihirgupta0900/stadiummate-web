@@ -1,7 +1,43 @@
 import React, { useState } from "react";
 import Layout from "~/components/Layout";
 import { useToast } from "@chakra-ui/react";
+import Trivia from "~/components/engagements/trivia";
+
+const trivia = [
+  {
+    id: 1,
+    question: "Who is the first Indian to score a century in the World Cup?",
+    options: [
+      "Sachin Tendulkar",
+      "Rahul Dravid",
+      "Sourav Ganguly",
+      "Virender Sehwag",
+    ],
+    answer: "Sachin Tendulkar",
+  },
+  {
+    id: 2,
+    question: "When was the Ashes first played? ",
+    options: ["1882", "1884", "1886", "1888"],
+    answer: "1882",
+  },
+  {
+    id: 3,
+    question: "Which Australian player has scored the most test runs? ",
+    options: ["Steve Waugh", "Ricky Ponting", "Don Bradman", "Mark Taylor"],
+    answer: "Don Bradman",
+  },
+  {
+    id: 4,
+    question:
+      "Who is the only batsman to record 400 runs in an international Test match? ",
+    options: ["Sachin Tendulkar", "Brian Lara", "Viv Richards", "Rahul Dravid"],
+    answer: "Viv Richards",
+  },
+] as const;
+
 const Engagement = () => {
+  const [markedAnswer, setMarkedAnswer] = useState("");
   const [buttonCLicked, setButtonCLicked] = useState(false);
   const toast = useToast();
   return (
@@ -69,6 +105,7 @@ const Engagement = () => {
           </div>
         </section>
       </div>
+      <Trivia />
     </Layout>
   );
 };
