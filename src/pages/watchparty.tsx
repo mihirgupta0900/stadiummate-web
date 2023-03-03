@@ -89,12 +89,13 @@ const Party: FC<{
   const watchPartyUtils = api.useContext().watchParty;
 
   const joinMutation = api.watchParty.join.useMutation({
-    onSuccess: async () => {
+    onSuccess: async ({ txHash }) => {
       await watchPartyUtils.getAll.invalidate();
       toast({
         title: `Joined ${party.title}`,
+        description: txHash && `You earned 10 tokens! TxHash: ${txHash}`,
         status: "success",
-        duration: 5000,
+        // duration: 5000,
         isClosable: true,
       });
     },

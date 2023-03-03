@@ -1,0 +1,1 @@
+export const FAN_TOKEN_ADDRESS = "0xaf6C09e7Fc621adD9F03279814e9dB7e2aac0eA2";
