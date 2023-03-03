@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Layout from "~/components/Layout";
 import { useToast } from "@chakra-ui/react";
 import Trivia from "~/components/engagements/trivia";
+import Look from "~/components/engagements/Look";
 
 const trivia = [
   {
@@ -106,6 +107,7 @@ const Engagement = () => {
         </section>
       </div>
       <Trivia />
+      <Look />
     </Layout>
   );
 };
