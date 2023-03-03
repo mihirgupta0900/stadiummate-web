@@ -1,19 +1,42 @@
 import {
   Button,
+  FormControl,
+  FormErrorMessage,
+  Heading,
   List,
   ListIcon,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Skeleton,
   Stack,
   Switch,
   Text,
+  useDisclosure,
+  useToast,
+  type UseDisclosureReturn,
 } from "@chakra-ui/react";
+import { clsx } from "clsx";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { type FC } from "react";
 import { BsGoogle } from "react-icons/bs";
 import useIsMatchMode from "~/hooks/useIsMatchMode";
-import { clsx } from "clsx";
+import useLoggedInUser from "~/hooks/useLoggedInUser";
+
+import { z } from "zod";
+import { api } from "~/utils/api";
+import { useZodForm } from "~/utils/form";
+
+import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { ethers } from "ethers";
+import "react-datepicker/dist/react-datepicker.css";
+import useTokenBalance from "~/hooks/useTokenBalance";
+import { CustomInput } from "~/pages/watchparty";
 
 type SidebarItem = {
   label: string;
@@ -57,15 +80,15 @@ const items: SidebarItem[] = [
 
 const Sidebar: FC = () => {
   const [isMatchMode, setIsMatchMode] = useIsMatchMode();
+  const { onOpen, ...rest } = useDisclosure({ defaultIsOpen: false });
 
   const { data: session } = useSession();
+  const { data: user } = useLoggedInUser();
+  const { data: balance, isLoading: isBalanceLoading } = useTokenBalance();
 
   const itemsToRender = items.filter(
     (item) => item.isMatchMode === isMatchMode
   );
-
-  //turn box red when isMachedMode is true
-  const bgColor = isMatchMode ? "bg-red-400" : "bg-gray-100";
 
   return (
     <div>
@@ -86,6 +109,7 @@ const Sidebar: FC = () => {
             {isMatchMode ? "Match Mode" : "Normal Mode"}
             <Switch
               ml={2}
+              isChecked={isMatchMode}
               onChange={() => {
                 setIsMatchMode(!isMatchMode);
               }}
@@ -99,7 +123,7 @@ const Sidebar: FC = () => {
                   passHref
                   href={{
                     pathname: item.route,
-                    query: isMatchMode ? { mode: "match" } : {},
+                    query: isMatchMode ? { match: "1" } : { match: "0" },
                   }}
                   key={item.route}
                 >
@@ -131,7 +155,46 @@ const Sidebar: FC = () => {
               <Stack color="white" mt={4}>
                 <Text fontSize={"lg"}>{session.user.name}</Text>
                 <Text fontSize={"sm"}>{session.user.email}</Text>
+                {user?.walletAddress && (
+                  <>
+                    <Text fontSize={"sm"} isTruncated>
+                      {user.walletAddress}
+                    </Text>
+                    {isBalanceLoading || !balance ? (
+                      <Skeleton height={4} />
+                    ) : (
+                      <Text fontSize={"sm"} className="flex items-center">
+                        Loyalty Points: {(balance / BigInt(1e18)).toString()}
+                        <a
+                          href={`https://mumbai.polygonscan.com/token/0xaf6c09e7fc621add9f03279814e9db7e2aac0ea2?a=${user.walletAddress}`}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          <ExternalLinkIcon className="ml-2" />
+                        </a>
+                      </Text>
+                    )}
+                  </>
+                )}
               </Stack>
+              {user?.walletAddress ? null : (
+                <>
+                  <Button
+                    variant="outline"
+                    mt={4}
+                    color="white"
+                    width={"full"}
+                    _hover={{
+                      bg: "none",
+                    }}
+                    onClick={onOpen}
+                  >
+                    Connect Wallet
+                  </Button>
+                  <AddWalletModal {...rest} />
+                </>
+              )}
+
               <Button
                 variant="outline"
                 mt={4}
@@ -165,6 +228,108 @@ const Sidebar: FC = () => {
         </div>
       </nav>
     </div>
+  );
+};
+
+export const addWalletSchema = z.object({
+  walletAddress: z.string().refine((value) => ethers.isAddress(value), {
+    message:
+      "Provided address is invalid. Please insure you have typed correctly.",
+  }),
+});
+
+const AddWalletModal: FC<Omit<UseDisclosureReturn, "onOpen">> = ({
+  isOpen,
+  onClose,
+}) => {
+  const toast = useToast();
+  const userUtils = api.useContext().user;
+  const mutation = api.user.addWalletAddress.useMutation({
+    onSuccess: async () => {
+      toast({
+        title: "Wallet address added",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      await userUtils.getUser.invalidate();
+      onClose();
+    },
+  });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid, isSubmitting },
+  } = useZodForm({
+    schema: addWalletSchema,
+  });
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  return (
+    <>
+      <Modal isOpen={isOpen} onClose={handleClose} size="xl">
+        <ModalOverlay />
+        <ModalContent bg="#1C202D" color="white">
+          <ModalHeader mx={"auto"} mt={4}>
+            <Heading size="lg" fontWeight="regular">
+              Add your wallet address
+            </Heading>
+          </ModalHeader>
+          <ModalBody>
+            <form
+              className="mt-4"
+              onSubmit={(e) => {
+                handleSubmit(async (values) => {
+                  await mutation.mutateAsync(values);
+                })(e).catch(() => {
+                  console.log(e);
+                });
+              }}
+            >
+              <FormControl isInvalid={!!errors.walletAddress}>
+                <CustomInput
+                  id="walletAddress"
+                  placeholder="Enter the walletAddress"
+                  {...register("walletAddress", {
+                    required: "Wallet Address is required",
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.walletAddress && errors.walletAddress.message}
+                </FormErrorMessage>
+              </FormControl>
+
+              <div className="my-6 flex justify-between">
+                <Button
+                  width="full"
+                  mr={2}
+                  type="submit"
+                  isLoading={isSubmitting}
+                  loadingText="Creating"
+                  isDisabled={!isValid}
+                  _disabled={{ bg: "gray.600" }}
+                >
+                  Submit
+                </Button>
+                <Button
+                  variant="ghost"
+                  width="full"
+                  onClick={handleClose}
+                  ml={2}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 

@@ -195,18 +195,20 @@ export const createWatchPartySchema = z.object({
   }),
 });
 
-const CustomInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
-  <Input
-    bg="rgba(201,201,201,22%)"
-    border="none"
-    _placeholder={{ color: "#989898" }}
-    color="white"
-    mt={6}
-    ref={ref}
-    size="lg"
-    {...props}
-  />
-));
+export const CustomInput = forwardRef<HTMLInputElement, InputProps>(
+  (props, ref) => (
+    <Input
+      bg="rgba(201,201,201,22%)"
+      border="none"
+      _placeholder={{ color: "#989898" }}
+      color="white"
+      mt={6}
+      ref={ref}
+      size="lg"
+      {...props}
+    />
+  )
+);
 CustomInput.displayName = "CustomInput";
 
 const handleUpload = async (file: File) => {

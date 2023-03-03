@@ -10,6 +10,7 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import { NextAdapter } from "next-query-params";
 import { QueryParamProvider } from "use-query-params";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "~/styles/globals.css";
 
@@ -67,6 +68,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <main className={montserrat.className}>
         <ChakraProvider theme={theme}>
           <QueryParamProvider adapter={NextAdapter}>
+            <ReactQueryDevtools initialIsOpen={false} />
             <Component {...pageProps} />
           </QueryParamProvider>
         </ChakraProvider>
