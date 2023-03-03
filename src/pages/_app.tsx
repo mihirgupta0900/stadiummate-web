@@ -8,6 +8,8 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import { api } from "~/utils/api";
+import { NextAdapter } from "next-query-params";
+import { QueryParamProvider } from "use-query-params";
 
 import "~/styles/globals.css";
 
@@ -64,7 +66,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <main className={montserrat.className}>
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          <QueryParamProvider adapter={NextAdapter}>
+            <Component {...pageProps} />
+          </QueryParamProvider>
         </ChakraProvider>
       </main>
     </SessionProvider>

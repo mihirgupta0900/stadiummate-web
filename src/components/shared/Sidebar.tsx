@@ -1,34 +1,67 @@
-import React, { FC, useState } from "react";
 import {
-  Switch,
-  FormControl,
-  FormLabel,
-  Stack,
-  Text,
   Button,
+  List,
+  ListIcon,
+  ListItem,
+  Stack,
+  Switch,
+  Text,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { type FC } from "react";
+import { BsGoogle } from "react-icons/bs";
+import useIsMatchMode from "~/hooks/useIsMatchMode";
+
+type SidebarItem = {
+  label: string;
+  route: string;
+  icon: string;
+  isMatchMode: boolean;
+};
+
+const items: SidebarItem[] = [
+  {
+    label: "Feed",
+    route: "/update",
+    icon: "/icons/cricket.svg",
+    isMatchMode: false,
+  },
+  {
+    label: "Watch Party",
+    route: "/watchparty",
+    icon: "/icons/experience.svg",
+    isMatchMode: false,
+  },
+  {
+    label: "voice",
+    route: "https://voice-stadiummate.vercel.app/",
+    icon: "/icons/mic.svg",
+    isMatchMode: false,
+  },
+  {
+    label: "experience",
+    route: "/engagement",
+    icon: "/icons/experience.svg",
+    isMatchMode: true,
+  },
+  {
+    label: "moments",
+    route: "/NFT",
+    icon: "/icons/nft.svg",
+    isMatchMode: true,
+  },
+];
+
 const Sidebar: FC = () => {
-  const [isMatchMode, setIsMatchMode] = useState(false);
-
-  const nonMatchModeRoutes = [
-    ["Feed", "/update", "/icons/cricket.svg"],
-    ["experience", "/watchparty", "/icons/experience.svg"],
-    ["voice", "https://voice-stadiummate.vercel.app/", "/icons/mic.svg"],
-    // ["profile", "/profile", "/icons/profile.svg"],
-  ] as const;
-
-  const matchModeRoutes = [
-    ["experience", "/engagement", "/icons/experience.svg"],
-    ["moments", "/NFT", "/icons/nft.svg"],
-    ["profile", "/profile", "/icons/profile.svg"],
-  ] as const;
+  const [isMatchMode, setIsMatchMode] = useIsMatchMode();
 
   const { data: session } = useSession();
-  const router = useRouter();
+
+  const itemsToRender = items.filter(
+    (item) => item.isMatchMode === isMatchMode
+  );
 
   return (
     <div>
@@ -40,7 +73,6 @@ const Sidebar: FC = () => {
         </div>
         <div>
           <div className="ml-4 text-white">
-            {/* <button className=""> */}
             {isMatchMode ? "Match Mode" : "Normal Mode"}
             <Switch
               ml={2}
@@ -49,30 +81,35 @@ const Sidebar: FC = () => {
               }}
             />
           </div>
-          {/* </button> */}
-          <ul>
-            {isMatchMode
-              ? matchModeRoutes.map(([route, link, img]) => (
-                  <li
-                    key={route}
-                    className="flex cursor-pointer flex-row items-center gap-4  px-6 py-4 text-white hover:bg-white/40 hover:text-[#7267CB]"
-                  >
-                    <img src={img} className="h-6 w-6" />
-                    <Link href={link}>{route}</Link>
-                  </li>
-                ))
-              : nonMatchModeRoutes.map(([route, link, img]) => (
-                  <li
-                    key={route}
-                    className="flex cursor-pointer flex-row items-center gap-4  px-6 py-4  text-white hover:bg-white/40 hover:text-[#5a44ff]"
-                  >
-                    <img src={img} className="h-6 w-6" />
-                    <Link href={link}>
-                      <p className=" font-medium ">{route}</p>
-                    </Link>
-                  </li>
-                ))}
-          </ul>
+
+          <List mt={4}>
+            {itemsToRender.map((item) => {
+              return (
+                <Link
+                  passHref
+                  href={{
+                    pathname: item.route,
+                    query: isMatchMode ? { mode: "match" } : {},
+                  }}
+                  key={item.route}
+                >
+                  <ListItem className="mx-2 flex cursor-pointer items-center rounded-md px-2 py-4 text-white hover:bg-indigo-400">
+                    <ListIcon
+                      as={() => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.icon}
+                          alt="Watch Party Icon"
+                          className="mr-4 h-6 w-6"
+                        />
+                      )}
+                    />
+                    <span>{item.label}</span>
+                  </ListItem>
+                </Link>
+              );
+            })}
+          </List>
           {session ? (
             <div className="mx-4">
               <Stack color="white" mt={4}>
@@ -87,7 +124,7 @@ const Sidebar: FC = () => {
                 _hover={{
                   bg: "none",
                 }}
-                onClick={() => void router.push("/api/auth/signout")}
+                onClick={() => void signOut()}
               >
                 Signout
               </Button>
@@ -102,9 +139,10 @@ const Sidebar: FC = () => {
                 _hover={{
                   bg: "none",
                 }}
-                onClick={() => void router.push("/api/auth/signin")}
+                onClick={() => void signIn("google")}
+                leftIcon={<BsGoogle />}
               >
-                Login
+                Login with Google
               </Button>
             </div>
           )}
